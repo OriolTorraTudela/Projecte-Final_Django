@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+  <div class="main-container py-5">
+    <h1 class="post-title mb-3">{{ post.title }}</h1>
+
+    <div class="post-meta mb-4">
+      {% if post.excerpt %}
+        <span class="post-excerpt">{{ post.excerpt }}</span>
+      {% endif %}
+      <time class="post-date">{{ post.date|date:"F j, Y" }}</time>
+      &ndash;
+      <a href="{{ post.author.get_absolute_url }}" class="post-author">
+        {{ post.author }}
+      </a>
+    </div>
+
+    {% if post.image_name %}
+      <div class="post-image mb-4">
+        <img
+          src="{% static 'images/' %}{{ post.image_name }}"
+          alt="{{ post.title }}"
+          class="img-fluid"
+        >
+      </div>
+    {% endif %}
+
+    <div class="post-content mb-5">
+      {{ post.content|linebreaks }}
+    </div>
+
+    {% if post.tags.all %}
+      <h2 class="mb-3">Etiquetes</h2>
+      <div class="tag-list mb-5">
+        {% for tag in post.tags.all %}
+          <a href="{% url 'tag-posts' tag.tag %}" class="tag-badge">{{ tag.tag }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

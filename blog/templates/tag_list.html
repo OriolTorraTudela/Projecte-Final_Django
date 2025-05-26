@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Etiquetes{% endblock %}
+
+{% block content %}
+  <div class="main-container py-5">
+    <h1 class="mb-4">Etiquetes</h1>
+    <div class="tag-list">
+      {% for tag in tags %}
+        <a href="{% url 'tag-posts' tag.tag %}" class="tag-badge">{{ tag.tag }}</a>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

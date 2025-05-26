@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Benvingut al Blog M3-UF6{% endblock %}
+
+{% block content %}
+  <!-- Banner petit -->
+  <section class="hero-banner">
+    <img src="{% static 'images/banner.jpg' %}" alt="Banner" class="hero-img">
+  </section>
+
+  <!-- Benvinguda -->
+  <section class="welcome">
+    <div class="container">
+      <h1 class="display-5">Benvingut al Blog M3 - UF6</h1>
+      <p class="lead">Aquest és el projecte d'aprenentatge M3-UF6 basat en Django</p>
+    </div>
+  </section>
+
+  <!-- 3 darrers posts en tres columnes -->
+  <div class="main-container py-5">
+    <h2 class="mb-4">Darrers Posts</h2>
+    <div class="posts-grid">
+      {% for post in posts|slice:":3" %}
+        <div class="card h-100 shadow-sm">
+          <img
+            src="{% static 'images/' %}{{ post.image_name }}"
+            class="card-img-top"
+            alt="{{ post.title }}"
+          >
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ post.title }}</h5>
+            <p class="card-text">{{ post.excerpt }}</p>
+            <a href="{{ post.get_absolute_url }}" class="btn btn-primary mt-auto">
+              Llegir més
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
