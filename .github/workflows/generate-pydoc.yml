@@ -1,0 +1,38 @@
+# .github/workflows/generate-pydoc.yml
+name: Genera documentació Pydoc completa
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with: { python-version: '3.x' }
+
+    - run: pip install -r requirements.txt
+
+    - name: Genera Pydoc per a models, views, urls…
+      run: |
+        mkdir -p docs
+        python -m pydoc -w blog.models
+        mv blog.models.html docs/models.html
+        python -m pydoc -w blog.views
+        mv blog.views.html docs/views.html
+        python -m pydoc -w blog.urls
+        mv blog.urls.html docs/urls.html
+        # Afegeix aquí més mòduls si en tens altres: tests, admin, …
+        python -m pydoc -w blog
+        mv blog.html docs/index.html
+
+    - name: Publica amb GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs
