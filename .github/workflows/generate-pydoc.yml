@@ -1,9 +1,9 @@
-name: Projecte Django M3-UF6 – Genera Pydoc i publica GH-Pages
+# .github/workflows/generate-pydoc.yml
+name: Genera Pydoc i publica GH-Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -14,31 +14,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Clona el repositori
         uses: actions/checkout@v3
 
-      - name: Set up Python 3.11
+      - name: Configura Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Instal·la dependències
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Apply migrations & run tests
+      - name: Aplica migracions i tests
         run: |
           python manage.py migrate
           python manage.py test
 
-      - name: Generate Pydoc documentation
+      - name: Genera documentació amb Pydoc
         env:
           DJANGO_SETTINGS_MODULE: my_site.settings
           PYTHONPATH: ${{ github.workspace }}
         run: |
           mkdir -p docs
-          python - << 'PYDOC'
+          python - << 'PYCODE'
 import os
 import django
 import pydoc
@@ -63,7 +63,7 @@ modules = [
 # 4) Genera un HTML per cada mòdul
 for mod in modules:
     print(f"– Generant doc per {mod}")
-    pydoc.writedoc(mod)  # crea e.g. 'blog.models.html'
+    pydoc.writedoc(mod)  # crea 'blog.models.html', etc.
     src = f"{mod}.html"
     dst = os.path.join(docs_dir, mod.split(".")[-1] + ".html")
     if os.path.exists(src):
@@ -74,11 +74,12 @@ for mod in modules:
 # 5) Documenta el paquet arrel i crea index.html
 print("– Generant doc per paquet blog")
 pydoc.writedoc("blog")  # crea 'blog.html'
-if os.path.exists("blog.html"):
-    os.replace("blog.html", os.path.join(docs_dir, "index.html"))
-PYDOC
+src = "blog.html"
+if os.path.exists(src):
+    os.replace(src, os.path.join(docs_dir, "index.html"))
+PYCODE
 
-      - name: Deploy to GitHub Pages (gh-pages)
+      - name: Publica a GitHub Pages (gh-pages)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
