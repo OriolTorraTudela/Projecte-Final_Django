@@ -1,3 +1,4 @@
+# .github/workflows/generate-pydoc.yml
 name: Projecte Django – Oriol Torra
 
 on:
@@ -26,6 +27,7 @@ jobs:
       - name: Instal·la dependències
         run: |
           python -m pip install --upgrade pip
+          pip install Django
           pip install -r requirements.txt
 
       - name: Aplica migracions
@@ -40,17 +42,15 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           mkdir -p docs
-          # Genera un HTML per a cada mòdul .py
           for file in $(find . -name "*.py" ! -path "./venv/*" ! -path "./*/migrations/*"); do
-            module=${file#./}               # treu el prefix ./
-            module=${module%.py}            # treu l’extensió
-            module=${module//\//.}          # converteix rutes en punts
+            module=${file#./}              
+            module=${module%.py}           
+            module=${module//\//.}         
             echo "Generant doc per $module"
             pydoc -w "$module" || echo "⚠️ Error amb $module"
           done
           mv *.html docs/ || true
 
-          # Crea l’índex de la documentació
           echo "# 📚 Documentació Pydoc" > docs/index.html
           for f in docs/*.html; do
             name=$(basename "$f")
