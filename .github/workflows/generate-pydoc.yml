@@ -3,8 +3,6 @@ name: Genera Pydoc i publica GH-Pages
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -33,51 +31,23 @@ jobs:
           python manage.py migrate
           python manage.py test
 
-      - name: Genera documentació amb Pydoc (amb django.setup())
+      - name: Genera documentació amb Pydoc
         env:
-          DJANGO_SETTINGS_MODULE: my_site.settings   # ← posa aquí el path real dels teus settings
+          DJANGO_SETTINGS_MODULE: my_site.settings   # ← ajusta aquest path
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          python - << 'EOF'
-import os, django, pydoc
-
-# 1) Carrega Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_site.settings')
-django.setup()
-
-# 2) Carpeta de destí
-docs_dir = os.path.join(os.getcwd(), 'docs')
-os.makedirs(docs_dir, exist_ok=True)
-
-# 3) Mòduls a documentar
-modules = [
-    'blog.models',
-    'blog.views',
-    'blog.urls',
-    'blog.admin',
-    'blog.tests',
-]
-
-# 4) Genera un HTML per cada mòdul
-for mod in modules:
-    try:
-        print(f"– Generant doc per {mod}")
-        pydoc.writedoc(mod)                # crea 'blog.models.html'
-        src = f"{mod}.html"                # nom generat
-        base = mod.split('.')[-1] + '.html'
-        dst = os.path.join(docs_dir, base)
-        if os.path.exists(src):
-            os.replace(src, dst)
-        else:
-            print(f"⚠️ No trobat {src}")
-    except Exception as e:
-        print(f"⚠️ Saltant {mod}: {e}")
-
-# 5) Documentació del paquet arrel
-pydoc.writedoc('blog')                     # crea 'blog.html'
-if os.path.exists('blog.html'):
-    os.replace('blog.html', os.path.join(docs_dir, 'index.html'))
-EOF
+          mkdir -p docs
+          for m in models views urls admin tests; do
+            echo "– Generant blog.$m"
+            python -c "import os, django, pydoc; \
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','my_site.settings'); \
+django.setup(); \
+pydoc.writedoc(f'blog.$m')"
+            mv blog.$m.html docs/$m.html
+          done
+          # Índex del paquet
+          python -c "import pydoc; pydoc.writedoc('blog')"
+          mv blog.html docs/index.html
 
       - name: Publica a GitHub Pages (gh-pages)
         uses: peaceiris/actions-gh-pages@v3
