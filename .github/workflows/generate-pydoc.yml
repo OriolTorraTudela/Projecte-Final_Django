@@ -1,38 +1,84 @@
-# .github/workflows/generate-pydoc.yml
-name: Genera documentació Pydoc completa
+name: Projecte Django – Oriol Torra
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build-and-deploy:
+  build-and-doc:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Clona el repositori
+        uses: actions/checkout@v3
 
-    - uses: actions/setup-python@v4
-      with: { python-version: '3.11' }
+      - name: Instal·la Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - run: pip install -r requirements.txt
+      - name: Instal·la dependències
+        run: |
+          python -m pip install --upgrade pip
+          pip install Django
 
-    - name: Genera Pydoc per a models, views, urls…
-      run: |
-        mkdir -p docs
-        python -m pydoc -w blog.models
-        mv blog.models.html docs/models.html
-        python -m pydoc -w blog.views
-        mv blog.views.html docs/views.html
-        python -m pydoc -w blog.urls
-        mv blog.urls.html docs/urls.html
-        # Afegeix aquí més mòduls si en tens altres: tests, admin, …
-        python -m pydoc -w blog
-        mv blog.html docs/index.html
+      - name: Aplica les migracions
+        run: |
+          python manage.py migrate
 
-    - name: Publica amb GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs
+      - name: Executa els tests
+        run: |
+          python manage.py test
+
+      - name: Genera documentació HTML amb Pydoc
+        run: |
+          mkdir -p docs
+          # Genera un HTML per a cada mòdul .py
+          for file in $(find . -name "*.py" ! -path "./venv/*" ! -path "./*/migrations/*"); do
+            module_path=$(echo "$file" | sed 's|^\./||; s|/|.|g; s|\.py$||')
+            echo "Generant doc per $module_path"
+            python -m pydoc -w "$module_path" || echo "Error amb $module_path, saltant..."
+          done
+          # Mou tots els .html de la carpeta arrel a docs/
+          mv *.html docs/ || true
+          # Crea un index.html amb enllaços
+          cat > docs/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>📚 Documentació Pydoc</title></head>
+<body>
+<h1>📚 Documentació Pydoc</h1>
+<ul>
+EOF
+          for f in docs/*.html; do
+            fname=$(basename "$f")
+            echo "  <li><a href=\"$fname\">$fname</a></li>" >> docs/index.html
+          done
+          echo "</ul></body></html>" >> docs/index.html
+
+      - name: Publica documentació a GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs
+          publish_branch: gh-pages
+
+      - name: Actualitza enllaç al README.md
+        run: |
+          DOC_LINK="[📚 Documentació Pydoc](https://OriolTorraTudela.github.io/Projecte-Final_Django/)"
+          if ! grep -q "Documentació Pydoc" README.md; then
+            echo -e "\n$DOC_LINK" >> README.md
+          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add README.md
+          git diff --cached --quiet || git commit -m "Actualitzat README amb enllaç a la documentació"
+          git push origin main
