@@ -24,11 +24,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Instal·la dependències
+      - name: Instal·la Django
         run: |
           python -m pip install --upgrade pip
           pip install Django
-          pip install -r requirements.txt
 
       - name: Aplica migracions i executa tests
         run: |
@@ -40,20 +39,21 @@ jobs:
           DJANGO_SETTINGS_MODULE: my_site.settings
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          # Torna a assegurar-te que Django està instal·lat
+          # Assegura Django disponible de nou
           python -m pip install Django
 
           mkdir -p docs
+          # Genera un HTML per a cada mòdul
           for file in $(find . -name "*.py" ! -path "./venv/*" ! -path "./*/migrations/*"); do
-            module=${file#./}                 # treu el prefix "./"
-            module=${module%.py}              # treu l'extensió
-            module=${module//\//.}            # converteix rutes en punts
+            module=${file#./}       # elimina ./ inicial
+            module=${module%.py}    # elimina .py
+            module=${module//\//.}  # converteix / en .
             echo "Generant doc per $module"
             pydoc -w "$module" || echo "⚠️ Error amb $module"
           done
           mv *.html docs/ || true
 
-          # Crea l'índex de la documentació
+          # Crea l'index
           echo "# 📚 Documentació Pydoc" > docs/index.html
           for f in docs/*.html; do
             name=$(basename "$f")
@@ -67,7 +67,7 @@ jobs:
           publish_branch: gh-pages
           publish_dir: docs
 
-      - name: Actualitza README.md amb enllaç a la doc
+      - name: Actualitza README.md amb enllaç
         run: |
           LINK="[📚 Documentació Pydoc](https://OriolTorraTudela.github.io/Projecte-Final_Django/)"
           if ! grep -q "Documentació Pydoc" README.md; then
