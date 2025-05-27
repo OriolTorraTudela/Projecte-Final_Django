@@ -1,9 +1,10 @@
-name: Genera Pydoc i publica GH-Pages
+name: Projecte Django – Oriol Torra
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -28,23 +29,25 @@ jobs:
       - name: Aplica migracions
         run: python manage.py migrate
 
-      - name: Genera tests
+      - name: Executa tests
         run: python manage.py test
 
-      - name: Genera Pydoc per a cada mòdul i paquet
+      - name: Genera documentació HTML amb Pydoc
+        # Importa Django amb settings, i posa PYTHONPATH a l'arrel per trobar 'blog'
+        env:
+          DJANGO_SETTINGS_MODULE: my_site.settings
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           mkdir -p docs
-          # Genera doc per cada mòdul explícit
           for m in models views urls admin tests; do
             echo "Generant doc per blog.$m"
-            python -m pydoc -w blog.$m
+            python -m pydoc -w blog.$m || echo "⚠️ error amb blog.$m, seguint..."
             mv blog.$m.html docs/$m.html
           done
-          # Genera el paquet arrel
           python -m pydoc -w blog
           mv blog.html docs/index.html
 
-      - name: Publica a GitHub Pages (gh-pages)
+      - name: Publica amb GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
