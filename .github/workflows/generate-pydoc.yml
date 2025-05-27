@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  build-and-doc:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,27 +30,30 @@ jobs:
           pip install Django
           pip install -r requirements.txt
 
-      - name: Aplica migracions
-        run: python manage.py migrate
+      - name: Aplica migracions i executa tests
+        run: |
+          python manage.py migrate
+          python manage.py test
 
-      - name: Executa tests
-        run: python manage.py test
-
-      - name: Genera Pydoc
+      - name: Genera documentació amb Pydoc
         env:
           DJANGO_SETTINGS_MODULE: my_site.settings
           PYTHONPATH: ${{ github.workspace }}
         run: |
+          # Torna a assegurar-te que Django està instal·lat
+          python -m pip install Django
+
           mkdir -p docs
           for file in $(find . -name "*.py" ! -path "./venv/*" ! -path "./*/migrations/*"); do
-            module=${file#./}              
-            module=${module%.py}           
-            module=${module//\//.}         
+            module=${file#./}                 # treu el prefix "./"
+            module=${module%.py}              # treu l'extensió
+            module=${module//\//.}            # converteix rutes en punts
             echo "Generant doc per $module"
             pydoc -w "$module" || echo "⚠️ Error amb $module"
           done
           mv *.html docs/ || true
 
+          # Crea l'índex de la documentació
           echo "# 📚 Documentació Pydoc" > docs/index.html
           for f in docs/*.html; do
             name=$(basename "$f")
@@ -64,7 +67,7 @@ jobs:
           publish_branch: gh-pages
           publish_dir: docs
 
-      - name: Actualitza README.md amb enllaç
+      - name: Actualitza README.md amb enllaç a la doc
         run: |
           LINK="[📚 Documentació Pydoc](https://OriolTorraTudela.github.io/Projecte-Final_Django/)"
           if ! grep -q "Documentació Pydoc" README.md; then
@@ -72,6 +75,6 @@ jobs:
             git config --global user.name "github-actions"
             git config --global user.email "github-actions@github.com"
             git add README.md
-            git commit -m "Afegit enllaç Pydoc al README"
+            git commit -m "Afegit enllaç a la documentació Pydoc"
             git push origin main
           fi
