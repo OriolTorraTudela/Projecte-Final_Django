@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module my_site.settings</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="my_site.html" class="white">my_site</a>.settings</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:/home/runner/work/Projecte-Final_Django/Projecte-Final_Django/my_site/settings.py">/home/runner/work/Projecte-Final_Django/Projecte-Final_Django/my_site/settings.py</a></td></tr></table>
+    <p><span class="code">Django&nbsp;settings&nbsp;for&nbsp;my_site&nbsp;project.<br>
+&nbsp;<br>
+Generated&nbsp;by&nbsp;'django-admin&nbsp;startproject'&nbsp;using&nbsp;Django&nbsp;5.2.1.<br>
+&nbsp;<br>
+For&nbsp;more&nbsp;information&nbsp;on&nbsp;this&nbsp;file,&nbsp;see<br>
+<a href="https://docs.djangoproject.com/en/5.2/topics/settings/">https://docs.djangoproject.com/en/5.2/topics/settings/</a><br>
+&nbsp;<br>
+For&nbsp;the&nbsp;full&nbsp;list&nbsp;of&nbsp;settings&nbsp;and&nbsp;their&nbsp;values,&nbsp;see<br>
+<a href="https://docs.djangoproject.com/en/5.2/ref/settings/">https://docs.djangoproject.com/en/5.2/ref/settings/</a></span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="django.apps.config.html#AppConfig">django.apps.config.AppConfig</a>(<a href="builtins.html#object">builtins.object</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="my_site.settings.html#BlogConfig">BlogConfig</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="BlogConfig">class <strong>BlogConfig</strong></a>(<a href="django.apps.config.html#AppConfig">django.apps.config.AppConfig</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#BlogConfig">BlogConfig</a>(app_name,&nbsp;app_module)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="my_site.settings.html#BlogConfig">BlogConfig</a></dd>
+<dd><a href="django.apps.config.html#AppConfig">django.apps.config.AppConfig</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>name</strong> = 'blog'</dl>
+
+<hr>
+Methods inherited from <a href="django.apps.config.html#AppConfig">django.apps.config.AppConfig</a>:<br>
+<dl><dt><a name="BlogConfig-__init__"><strong>__init__</strong></a>(self, app_name, app_module)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="BlogConfig-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><span class="code">Return&nbsp;repr(self).</span></dd></dl>
+
+<strong>default_auto_field</strong> = &lt;django.utils.functional.cached_property object&gt;
+<dl><dt><a name="BlogConfig-get_model"><strong>get_model</strong></a>(self, model_name, require_ready=True)</dt><dd><span class="code">Return&nbsp;the&nbsp;model&nbsp;with&nbsp;the&nbsp;given&nbsp;case-insensitive&nbsp;model_name.<br>
+&nbsp;<br>
+Raise&nbsp;LookupError&nbsp;if&nbsp;no&nbsp;model&nbsp;exists&nbsp;with&nbsp;this&nbsp;name.</span></dd></dl>
+
+<dl><dt><a name="BlogConfig-get_models"><strong>get_models</strong></a>(self, include_auto_created=False, include_swapped=False)</dt><dd><span class="code">Return&nbsp;an&nbsp;iterable&nbsp;of&nbsp;models.<br>
+&nbsp;<br>
+By&nbsp;default,&nbsp;the&nbsp;following&nbsp;models&nbsp;aren't&nbsp;included:<br>
+&nbsp;<br>
+-&nbsp;auto-created&nbsp;models&nbsp;for&nbsp;many-to-many&nbsp;relations&nbsp;without<br>
+&nbsp;&nbsp;an&nbsp;explicit&nbsp;intermediate&nbsp;table,<br>
+-&nbsp;models&nbsp;that&nbsp;have&nbsp;been&nbsp;swapped&nbsp;out.<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;corresponding&nbsp;keyword&nbsp;argument&nbsp;to&nbsp;True&nbsp;to&nbsp;include&nbsp;such&nbsp;models.<br>
+Keyword&nbsp;arguments&nbsp;aren't&nbsp;documented;&nbsp;they're&nbsp;a&nbsp;private&nbsp;API.</span></dd></dl>
+
+<dl><dt><a name="BlogConfig-import_models"><strong>import_models</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="BlogConfig-ready"><strong>ready</strong></a>(self)</dt><dd><span class="code">Override&nbsp;this&nbsp;method&nbsp;in&nbsp;subclasses&nbsp;to&nbsp;run&nbsp;code&nbsp;when&nbsp;Django&nbsp;starts.</span></dd></dl>
+
+<hr>
+Class methods inherited from <a href="django.apps.config.html#AppConfig">django.apps.config.AppConfig</a>:<br>
+<dl><dt><a name="BlogConfig-create"><strong>create</strong></a>(entry)</dt><dd><span class="code">Factory&nbsp;that&nbsp;creates&nbsp;an&nbsp;app&nbsp;config&nbsp;from&nbsp;an&nbsp;entry&nbsp;in&nbsp;INSTALLED_APPS.</span></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="django.apps.config.html#AppConfig">django.apps.config.AppConfig</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>ALLOWED_HOSTS</strong> = []<br>
+<strong>AUTH_PASSWORD_VALIDATORS</strong> = [{'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'}, {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'}, {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'}, {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}]<br>
+<strong>BASE_DIR</strong> = PosixPath('/home/runner/work/Projecte-Final_Django/Projecte-Final_Django')<br>
+<strong>DATABASES</strong> = {'default': {'ATOMIC_REQUESTS': False, 'AUTOCOMMIT': True, 'CONN_HEALTH_CHECKS': False, 'CONN_MAX_AGE': 0, 'ENGINE': 'django.db.backends.sqlite3', 'HOST': '', 'NAME': PosixPath('/home/runner/work/Projecte-Final_Django/Projecte-Final_Django/db.sqlite3'), 'OPTIONS': {}, 'PASSWORD': '', 'PORT': '', ...}}<br>
+<strong>DEBUG</strong> = True<br>
+<strong>DEFAULT_AUTO_FIELD</strong> = 'django.db.models.BigAutoField'<br>
+<strong>INSTALLED_APPS</strong> = ['django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles', 'blog.apps.BlogConfig']<br>
+<strong>LANGUAGE_CODE</strong> = 'ca'<br>
+<strong>MIDDLEWARE</strong> = ['django.middleware.security.SecurityMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware', 'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware', 'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware']<br>
+<strong>ROOT_URLCONF</strong> = 'my_site.urls'<br>
+<strong>SECRET_KEY</strong> = '1qazZAQ!'<br>
+<strong>STATICFILES_DIRS</strong> = [PosixPath('/home/runner/work/Projecte-Final_Django/Projecte-Final_Django/static')]<br>
+<strong>STATIC_URL</strong> = '/static/'<br>
+<strong>TEMPLATES</strong> = [{'APP_DIRS': True, 'BACKEND': 'django.template.backends.django.DjangoTemplates', 'DIRS': [PosixPath('/home/runner/work/Projecte-Final_Django/Projecte-Final_Django/blog/templates')], 'OPTIONS': {'context_processors': ['django.template.context_processors.request', 'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages']}}]<br>
+<strong>TIME_ZONE</strong> = 'Europe/Madrid'<br>
+<strong>USE_I18N</strong> = True<br>
+<strong>USE_TZ</strong> = True<br>
+<strong>WSGI_APPLICATION</strong> = 'my_site.wsgi.application'</td></tr></table>
+</body></html>
