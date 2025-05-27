@@ -15,8 +15,4 @@ instal·la dependències amb pip install -r requirements.txt i aplica migracions
 Arrenca el servidor amb python manage.py runserver i obre http://127.0.0.1:8000/ en el navegador.
 
 ## Documentació del codi  
-La documentació es genera amb Pydoc i es publica automàticament amb GitHub Actions:  
-https://OriolTorraTudela.github.io/Projecte-Final_Django/
-
-
 [📚 Documentació Pydoc](https://OriolTorraTudela.github.io/Projecte-Final_Django/)
