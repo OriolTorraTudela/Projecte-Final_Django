@@ -39,7 +39,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: my_site.settings
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          python - <<'EOF'
+          python - << 'EOF'
           import os, django, pydoc
 
           # 1) Configura Django
@@ -51,53 +51,54 @@ jobs:
           docs_dir = os.path.join(base, 'docs')
           os.makedirs(docs_dir, exist_ok=True)
 
-          # 3) Genera HTML per a cada mòdul .py
+          # 3) Genera HTML per a cada .py
           for root, dirs, files in os.walk(base):
               if 'venv' in root or 'migrations' in root:
                   continue
               for fn in files:
                   if not fn.endswith('.py'):
                       continue
-                  full = os.path.join(root, fn)
-                  mod = full[len(base)+1:-3].replace(os.sep, '.')
-                  print(f"Generant doc per {mod}")
+                  path = os.path.join(root, fn)
+                  module = path[len(base)+1:-3].replace(os.sep, '.')
+                  print(f"Generant doc per {module}")
                   try:
-                      pydoc.writedoc(mod)
+                      pydoc.writedoc(module)
                   except Exception as e:
-                      print(f"⚠️ Error amb {mod}: {e}")
+                      print(f"⚠️ Error amb {module}: {e}")
 
-          # 4) Mou tots els *.html generats a docs/
-          for f in os.listdir(base):
-              if f.endswith('.html'):
-                  os.replace(os.path.join(base, f), os.path.join(docs_dir, f))
+          # 4) Mou tots els .html generats a docs/
+          for fname in os.listdir(base):
+              if fname.endswith('.html'):
+                  os.replace(os.path.join(base, fname),
+                             os.path.join(docs_dir, fname))
 
           # 5) Crea un veritable index.html amb <ul> d’enllaços
           index_path = os.path.join(docs_dir, 'index.html')
           with open(index_path, 'w', encoding='utf-8') as idx:
               idx.write("""<!DOCTYPE html>
-<html lang="ca">
-<head>
-  <meta charset="UTF-8">
-  <title>📚 Documentació Pydoc</title>
-  <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    ul { list-style: none; padding: 0; }
-    li + li { margin-top: 0.5rem; }
-    a { text-decoration: none; color: #0366d6; }
-    a:hover { text-decoration: underline; }
-  </style>
-</head>
-<body>
-  <h1>📚 Documentació Pydoc</h1>
-  <ul>
-""")
+          <html lang="ca">
+          <head>
+            <meta charset="UTF-8">
+            <title>📚 Documentació Pydoc</title>
+            <style>
+              body { font-family: sans-serif; margin: 2rem; }
+              ul { list-style: none; padding: 0; }
+              li + li { margin-top: 0.5rem; }
+              a { text-decoration: none; color: #0366d6; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>📚 Documentació Pydoc</h1>
+            <ul>
+          """)
               for html in sorted(os.listdir(docs_dir)):
                   if html == 'index.html':
                       continue
-                  idx.write(f'    <li><a href="{html}">{html}</a></li>\n')
-              idx.write("""  </ul>
-</body>
-</html>""")
+                  idx.write(f'  <li><a href="{html}">{html}</a></li>\n')
+              idx.write("""    </ul>
+          </body>
+          </html>""")
           print("✅ docs/index.html generat correctament")
           EOF
 
