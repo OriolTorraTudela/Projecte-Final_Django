@@ -1,87 +1,86 @@
-name: Projecte Django – Oriol Torra
+name: Projecte Django M3-UF6 – Genera Pydoc i publica GH-Pages
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-and-doc:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clona el repositori
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Instal·la Python 3.11
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Instal·la dependències
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Aplica les migracions
+      - name: Apply migrations & run tests
         run: |
           python manage.py migrate
-
-      - name: Executa els tests
-        run: |
           python manage.py test
 
-      - name: Genera documentació HTML amb Pydoc
+      - name: Generate Pydoc documentation
         env:
           DJANGO_SETTINGS_MODULE: my_site.settings
           PYTHONPATH: ${{ github.workspace }}
         run: |
           mkdir -p docs
-          for file in $(find . -name "*.py" ! -path "./venv/*" ! -path "./*/migrations/*"); do
-            module_path=$(echo "$file" | sed 's|^\./||' | sed 's|/|.|g' | sed 's|\.py$||')
-            echo "Generant doc per $module_path"
-            python -c "import os, django, pydoc; \
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','my_site.settings'); \
-django.setup(); \
-pydoc.writedoc('$module_path')" \
-            && mv "${module_path}.html" docs/ || echo "⚠️ Error amb $module_path, saltant..."
-          done
+          python - << 'PYDOC'
+import os
+import django
+import pydoc
 
-          # Crea index.html amb enllaços a tots els HTML generats
-          cat > docs/index.html << 'EOF'
-📚 Documentació Pydoc
+# 1) Configura Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "my_site.settings")
+django.setup()
 
-EOF
-          for f in docs/*.html; do
-            fname=$(basename "$f")
-            echo "- [$fname]($fname)" >> docs/index.html
-          done
+# 2) Carpeta de destí
+docs_dir = os.path.join(os.getcwd(), "docs")
+os.makedirs(docs_dir, exist_ok=True)
 
-      - name: Publica documentació a GitHub Pages
+# 3) Mòduls a documentar
+modules = [
+    "blog.models",
+    "blog.views",
+    "blog.urls",
+    "blog.admin",
+    "blog.tests",
+]
+
+# 4) Genera un HTML per cada mòdul
+for mod in modules:
+    print(f"– Generant doc per {mod}")
+    pydoc.writedoc(mod)  # crea e.g. 'blog.models.html'
+    src = f"{mod}.html"
+    dst = os.path.join(docs_dir, mod.split(".")[-1] + ".html")
+    if os.path.exists(src):
+        os.replace(src, dst)
+    else:
+        print(f"⚠️ No trobat {src}")
+
+# 5) Documenta el paquet arrel i crea index.html
+print("– Generant doc per paquet blog")
+pydoc.writedoc("blog")  # crea 'blog.html'
+if os.path.exists("blog.html"):
+    os.replace("blog.html", os.path.join(docs_dir, "index.html"))
+PYDOC
+
+      - name: Deploy to GitHub Pages (gh-pages)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: docs
-
-      - name: Actualitza enllaç al README.md sense duplicats
-        run: |
-          DOC_LINK="[📚 Documentació Pydoc](https://OriolTorraTudela.github.io/Projecte-Final_Django/)"
-
-          if [ ! -f README.md ]; then
-            echo -e "# Projecte-Final_Django\n\n$DOC_LINK" > README.md
-          else
-            sed -i '/Documentació Pydoc/d' README.md
-            echo -e "\n$DOC_LINK" >> README.md
-          fi
-
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add README.md
-          git diff --cached --quiet || git commit -m "Actualitzat README amb enllaç a la documentació"
-          git push origin main
