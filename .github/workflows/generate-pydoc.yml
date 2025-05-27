@@ -2,11 +2,9 @@ name: Genera Pydoc i publica GH-Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -30,57 +28,56 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Aplica migracions
-        run: python manage.py migrate
-
-      - name: Executa tests
-        run: python manage.py test
+      - name: Aplica migracions i tests
+        run: |
+          python manage.py migrate
+          python manage.py test
 
       - name: Genera documentació amb Pydoc (amb django.setup())
         env:
-          DJANGO_SETTINGS_MODULE: my_site.settings   # ← substitueix pel path real dels teus settings
+          DJANGO_SETTINGS_MODULE: my_site.settings   # ← posa aquí el path real dels teus settings
           PYTHONPATH: ${{ github.workspace }}
         run: |
           python - << 'EOF'
-            import os, django, pydoc
+import os, django, pydoc
 
-            # 1) Configura Django
-            os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_site.settings')
-            django.setup()
+# 1) Carrega Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_site.settings')
+django.setup()
 
-            # 2) Carpeta de destí
-            docs_dir = os.path.join(os.getcwd(), 'docs')
-            os.makedirs(docs_dir, exist_ok=True)
+# 2) Carpeta de destí
+docs_dir = os.path.join(os.getcwd(), 'docs')
+os.makedirs(docs_dir, exist_ok=True)
 
-            # 3) Defineix quins mòduls documentar
-            modules = [
-              'blog.models',
-              'blog.views',
-              'blog.urls',
-              'blog.admin',
-              'blog.tests',
-            ]
+# 3) Mòduls a documentar
+modules = [
+    'blog.models',
+    'blog.views',
+    'blog.urls',
+    'blog.admin',
+    'blog.tests',
+]
 
-            # 4) Genera un .html per a cada mòdul
-            for mod in modules:
-                try:
-                    print(f"– Generant doc per {mod}")
-                    pydoc.writedoc(mod)                     # crea 'blog.models.html'
-                    src = f"{mod}.html"
-                    base = mod.split('.')[-1] + '.html'     # 'models.html'
-                    dst = os.path.join(docs_dir, base)
-                    if os.path.exists(src):
-                        os.replace(src, dst)
-                    else:
-                        print(f"⚠️ No trobat {src}")
-                except Exception as e:
-                    print(f"⚠️ Saltant {mod}: {e}")
+# 4) Genera un HTML per cada mòdul
+for mod in modules:
+    try:
+        print(f"– Generant doc per {mod}")
+        pydoc.writedoc(mod)                # crea 'blog.models.html'
+        src = f"{mod}.html"                # nom generat
+        base = mod.split('.')[-1] + '.html'
+        dst = os.path.join(docs_dir, base)
+        if os.path.exists(src):
+            os.replace(src, dst)
+        else:
+            print(f"⚠️ No trobat {src}")
+    except Exception as e:
+        print(f"⚠️ Saltant {mod}: {e}")
 
-            # 5) Genera l'índex del paquet
-            pydoc.writedoc('blog')                       # crea 'blog.html'
-            if os.path.exists('blog.html'):
-                os.replace('blog.html', os.path.join(docs_dir, 'index.html'))
-          EOF
+# 5) Documentació del paquet arrel
+pydoc.writedoc('blog')                     # crea 'blog.html'
+if os.path.exists('blog.html'):
+    os.replace('blog.html', os.path.join(docs_dir, 'index.html'))
+EOF
 
       - name: Publica a GitHub Pages (gh-pages)
         uses: peaceiris/actions-gh-pages@v3
