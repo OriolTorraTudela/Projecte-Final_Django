@@ -1,9 +1,7 @@
-name: Projecte Django – Oriol Torra
+name: Genera Pydoc i publica GH-Pages
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
@@ -26,28 +24,46 @@ jobs:
       - name: Instal·la dependències
         run: pip install -r requirements.txt
 
-      - name: Aplica migracions
-        run: python manage.py migrate
+      - name: Aplica migracions i tests
+        run: |
+          python manage.py migrate
+          python manage.py test
 
-      - name: Executa tests
-        run: python manage.py test
-
-      - name: Genera documentació HTML amb Pydoc
-        # Importa Django amb settings, i posa PYTHONPATH a l'arrel per trobar 'blog'
+      - name: Genera documentació amb Pydoc (amb django.setup())
         env:
-          DJANGO_SETTINGS_MODULE: my_site.settings
+          DJANGO_SETTINGS_MODULE: my_site.settings   # Canvia-ho pel teu path real!
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          mkdir -p docs
-          for m in models views urls admin tests; do
-            echo "Generant doc per blog.$m"
-            python -m pydoc -w blog.$m || echo "⚠️ error amb blog.$m, seguint..."
-            mv blog.$m.html docs/$m.html
-          done
-          python -m pydoc -w blog
-          mv blog.html docs/index.html
+          python - <<'EOF'
+          import os, django, pydoc, pkgutil
 
-      - name: Publica amb GitHub Pages
+          # 1) Configura Django
+          os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_site.settings')
+          django.setup()
+
+          # 2) Prepara carpeta docs/
+          docs_dir = os.path.join(os.getcwd(), 'docs')
+          os.makedirs(docs_dir, exist_ok=True)
+
+          # 3) Troba tots els mòduls dins blog/ i genera HTML
+          import blog
+          prefix = blog.__name__ + '.'
+          for finder, name, ispkg in pkgutil.walk_packages(blog.__path__, prefix):
+              try:
+                  print(f"Generant doc per {name}")
+                  pydoc.writedoc(name)
+                  # mou el HTML generat a docs/
+                  basename = name.split('.')[-1] + '.html'
+                  os.replace(basename, os.path.join(docs_dir, basename))
+              except Exception as e:
+                  print(f"Saltar {name}: {e}")
+
+          # 4) Finalment genera l'índex del paquet
+          pydoc.writedoc('blog')
+          os.replace('blog.html', os.path.join(docs_dir, 'index.html'))
+          EOF
+
+      - name: Publica a GitHub Pages (gh-pages)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
