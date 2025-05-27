@@ -33,24 +33,24 @@ jobs:
 
       - name: Genera documentació amb Pydoc
         env:
-          DJANGO_SETTINGS_MODULE: my_site.settings
+          DJANGO_SETTINGS_MODULE: my_site.settings    # ← ajusta-ho
           PYTHONPATH: ${{ github.workspace }}
         run: |
           mkdir -p docs
-          python - << 'EOF'
+          python - <<EOF
 import os
 import django
 import pydoc
 
-# 1) Configura Django
+# Carrega Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "my_site.settings")
 django.setup()
 
-# 2) Carpeta de destí
+# Carpeta target
 docs_dir = os.path.join(os.getcwd(), "docs")
 os.makedirs(docs_dir, exist_ok=True)
 
-# 3) Defineix mòduls a documentar
+# Mòduls a documentar
 modules = [
     "blog.models",
     "blog.views",
@@ -59,27 +59,22 @@ modules = [
     "blog.tests",
 ]
 
-# 4) Genera HTML per cada mòdul
+# Genera cada HTML
 for mod in modules:
-    try:
-        print(f"– Generant doc per {mod}")
-        pydoc.writedoc(mod)  # crea 'blog.models.html', etc.
-        src = f"{mod}.html"
-        dst = os.path.join(docs_dir, mod.split(".")[-1] + ".html")
-        if os.path.exists(src):
-            os.replace(src, dst)
-        else:
-            print(f"⚠️ No existeix {src}")
-    except Exception as e:
-        print(f"⚠️ Saltant {mod}: {e}")
+    print(f"– Generant doc per {mod}")
+    pydoc.writedoc(mod)
+    src = f"{mod}.html"
+    dst = os.path.join(docs_dir, mod.split(".")[1] + ".html")
+    if os.path.exists(src):
+        os.replace(src, dst)
+    else:
+        print(f"⚠️ No trobat {src}")
 
-# 5) Documenta el paquet arrel i crea index.html
+# Documenta el paquet arrel
 print("– Generant doc per paquet blog")
-pydoc.writedoc("blog")  # crea 'blog.html'
-src = "blog.html"
-dst = os.path.join(docs_dir, "index.html")
-if os.path.exists(src):
-    os.replace(src, dst)
+pydoc.writedoc("blog")
+if os.path.exists("blog.html"):
+    os.replace("blog.html", os.path.join(docs_dir, "index.html"))
 EOF
 
       - name: Publica a GitHub Pages (gh-pages)
